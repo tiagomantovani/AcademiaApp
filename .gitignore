@@ -1,0 +1,39 @@
+# Root
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo / React Native
+.expo/
+dist/
+web-build/
+.expo-shared/
+expo-env.d.ts
+.ios/
+.android/
+
+# Env - nunca commitar chaves
+.env
+server/.env
+*.env.local
+
+# Supabase
+.supabase/
+
+# OS
+.DS_Store
+Thumbs.db
+*.pem
+*.key
+*.mobileprovision
+
+# Opencode cache (não commitar cache)
+.opencode-cache/
+.opencode-global/
+.opencode-global-data/
+.tmp-test-config/
+
+# Logs
+logs/
+*.log
