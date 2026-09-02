@@ -10,13 +10,15 @@ const PORT = 3001;
 const HOST = '0.0.0.0'; // escuta na rede para catraca acessar via 192.168.3.200
 
 // Mock + Supabase Real (se .env existir usa Supabase, senão mock)
+// Suporta chaves novas sb_secret_/sb_publishable_ e legadas eyJ...
 require('fs').existsSync(require('path').join(__dirname,'.env')) && require('dotenv')?.config?.();
 let supabase = null;
 try {
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+  const supaKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (process.env.SUPABASE_URL && supaKey) {
     const { createClient } = require('@supabase/supabase-js');
-    supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-    console.log('✅ Supabase conectado:', process.env.SUPABASE_URL);
+    supabase = createClient(process.env.SUPABASE_URL, supaKey);
+    console.log('✅ Supabase conectado:', process.env.SUPABASE_URL, `(key ${supaKey.slice(0,12)}...)`);
   } else {
     console.log('⚠️  Sem .env -> usando MOCK (crie server/.env para usar Supabase real)');
   }
