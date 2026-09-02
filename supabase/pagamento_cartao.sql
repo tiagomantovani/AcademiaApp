@@ -28,7 +28,9 @@ create index if not exists idx_pag_cartao_aluno on pagamentos_cartao(aluno_id, c
 create index if not exists idx_pag_cartao_mensalidade on pagamentos_cartao(mensalidade_id);
 
 -- View unificada pagamentos (pix + cartão) para dashboard atendente
+-- pagamentos_pix não tem gym_id (usa mensalidades.gym_id), por isso JOIN
 create or replace view vw_pagamentos as
-select id, aluno_id, mensalidade_id, gym_id, valor_informado as valor, status::text, 'pix' as metodo, created_at from pagamentos_pix
+select p.id, p.aluno_id, p.mensalidade_id, m.gym_id, p.valor_informado as valor, p.status::text, 'pix' as metodo, p.created_at
+from pagamentos_pix p left join mensalidades m on m.id = p.mensalidade_id
 union all
 select id, aluno_id, mensalidade_id, gym_id, valor, status::text, 'cartao' as metodo, created_at from pagamentos_cartao;
