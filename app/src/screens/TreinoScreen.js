@@ -111,7 +111,10 @@ export default function TreinoScreen({ navigation, route }) {
         <Text style={styles.btnText}>📱 Fazer Check-in (QR a+b)</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.btnSecondary,{backgroundColor:'#22c55e', borderColor:'#22c55e'}]} onPress={()=>navigation.navigate('Pix')}>
-        <Text style={styles.btnTextDark}>💰 Pix Mensalidade / Migrar Plano</Text>
+        <Text style={styles.btnTextDark}>💰 Pix / Cartão / Migrar Plano</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={[styles.btnSecondary,{backgroundColor:'#f59e0b', borderColor:'#f59e0b'}]} onPress={()=>navigation.navigate('Conquistas')}>
+        <Text style={[styles.btnText,{color:'#fff'}]}>🏆 Conquistas & Streak</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.btnSecondary} onPress={carregarTreino}><Text style={styles.btnTextDark}>🔄 Recarregar treino</Text></TouchableOpacity>
       {!isSupabaseConfigured && <Text style={styles.warn}>MOCK: sem Supabase, progresso 28/30 simulado</Text>}
