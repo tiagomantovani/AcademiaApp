@@ -36,7 +36,6 @@ export default function AnamneseScreen({ navigation, route }) {
         nivel_atividade: nivelAtiv,
         horas_sono: parseInt(horasSono)||7,
         fumante,
-        lgpd_consentimento: lgpd,
         validade_ate: new Date(Date.now()+90*24*3600*1000).toISOString().split('T')[0],
       }).select().single();
       if (error) throw error;

@@ -42,11 +42,23 @@ drop policy if exists p_anamneses on anamneses;
 create policy p_anamneses on anamneses for all using (
   aluno_id = auth.uid() or (auth_role() in ('professor','admin','dono') and gym_id = auth_gym())
 );
+-- PARQ: vinculado à anamnese
+drop policy if exists p_parq on parq_respostas;
+create policy p_parq on parq_respostas for all using (
+  exists (select 1 from anamneses a where a.id = anamnese_id and (a.aluno_id = auth.uid() or a.gym_id = auth_gym()))
+) with check (
+  exists (select 1 from anamneses a where a.id = anamnese_id and a.aluno_id = auth.uid())
+);
 
 -- TREINOS: aluno vê seus, professor vê do gym
 drop policy if exists p_treinos on treinos;
 create policy p_treinos on treinos for all using (
   aluno_id = auth.uid() or (auth_role() in ('professor','admin','dono') and gym_id = auth_gym())
+);
+-- TREINO_EXERCICIOS: via treino
+drop policy if exists p_treino_ex on treino_exercicios;
+create policy p_treino_ex on treino_exercicios for all using (
+  exists (select 1 from treinos t where t.id = treino_id and (t.aluno_id = auth.uid() or t.gym_id = auth_gym()))
 );
 
 -- SESSOES: aluno insere só suas, professor valida
@@ -64,6 +76,11 @@ drop policy if exists p_pag_pix on pagamentos_pix;
 create policy p_pag_pix on pagamentos_pix for all using (aluno_id = auth.uid() or exists (select 1 from mensalidades m where m.id = mensalidade_id and m.gym_id = auth_gym()));
 drop policy if exists p_pag_cartao on pagamentos_cartao;
 create policy p_pag_cartao on pagamentos_cartao for all using (aluno_id = auth.uid() or gym_id = auth_gym());
+-- CONQUISTAS / CHECK_INS: aluno vê suas
+drop policy if exists p_conquistas on conquistas;
+create policy p_conquistas on conquistas for all using (aluno_id = auth.uid() or gym_id = auth_gym());
+drop policy if exists p_checkins on check_ins;
+create policy p_checkins on check_ins for all using (aluno_id = auth.uid() or gym_id = auth_gym());
 
 -- Service_role bypassa RLS automaticamente (usado em server/catraca-server.js)
 -- Para testar: faça login como aluno joao.teste@academiaapp.local e tente select * from profiles onde id != seu id (deve retornar 0)
