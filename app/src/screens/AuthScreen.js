@@ -25,18 +25,28 @@ export default function AuthScreen({ navigation }) {
       if (modo === 'cadastro') {
         const { data, error } = await supabase.auth.signUp({ email, password: senha, options: { data: { nome, cpf } } });
         if (error) throw error;
-        // cria profile (trigger no DB pode fazer, mas garantimos aqui)
+        // cria profile (RLS agora permite insert com check true)
         if (data.user) {
-          await supabase.from('profiles').insert({
+          const { error: e2 } = await supabase.from('profiles').insert({
             id: data.user.id,
             gym_id: '00000000-0000-0000-0000-000000000001',
             role: 'aluno',
             nome,
             cpf: cpf.replace(/\D/g,'') || null,
           });
+          if (e2) console.log('profile insert err', e2.message);
         }
-        Alert.alert('Verifique seu e-mail', 'Confirme o cadastro e faça login.');
-        setModo('login');
+        // Se já tem sessão (email confirm desabilitado), vai direto para Anamnese
+        if (data.session) {
+          Alert.alert('Conta criada', 'Bem-vinda! Vamos para anamnese.');
+          navigation.navigate('Anamnese');
+        } else {
+          Alert.alert('Verifique seu e-mail', 'Confirme o cadastro e faça login. Se desabilitou confirmação no Dashboard Auth, faça login direto.');
+          // Tenta login automático para UX
+          const { error: e3 } = await supabase.auth.signInWithPassword({ email, password: senha });
+          if (!e3) navigation.navigate('Anamnese');
+          else setModo('login');
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
         if (error) throw error;

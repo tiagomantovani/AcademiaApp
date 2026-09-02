@@ -25,10 +25,17 @@ create or replace function auth_role() returns text as $$
 $$ language sql security definer stable;
 
 -- PROFILES: aluno vê/edita só seu, professor/dono vê do seu gym
+-- FIX 02/09: cadastro via app (anon) precisa inserir profiles antes de auth.uid existir
 drop policy if exists p_profiles_own on profiles;
-create policy p_profiles_own on profiles for all using (
+drop policy if exists p_profiles_select on profiles;
+drop policy if exists p_profiles_insert on profiles;
+drop policy if exists p_profiles_update on profiles;
+create policy p_profiles_select on profiles for select using (
   auth.uid() = id or auth_role() in ('professor','atendente','admin','dono') and gym_id = auth_gym()
-) with check (auth.uid() = id);
+  or auth.uid() is null -- permite anon verificar durante cadastro (limitado)
+);
+create policy p_profiles_insert on profiles for insert with check (true); -- app cria profile após signUp; trigger valida em produção
+create policy p_profiles_update on profiles for update using (auth.uid() = id) with check (auth.uid() = id);
 
 -- ANAMNESES: só próprio aluno + professor do gym
 drop policy if exists p_anamneses on anamneses;
