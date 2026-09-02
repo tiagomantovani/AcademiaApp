@@ -110,6 +110,9 @@ export default function TreinoScreen({ navigation, route }) {
       <TouchableOpacity style={styles.btnPrimary} onPress={()=>navigation.navigate('QR', { treinoId: treino.id })}>
         <Text style={styles.btnText}>📱 Fazer Check-in (QR a+b)</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={[styles.btnSecondary,{backgroundColor:'#22c55e', borderColor:'#22c55e'}]} onPress={()=>navigation.navigate('Pix')}>
+        <Text style={styles.btnTextDark}>💰 Pix Mensalidade / Migrar Plano</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.btnSecondary} onPress={carregarTreino}><Text style={styles.btnTextDark}>🔄 Recarregar treino</Text></TouchableOpacity>
       {!isSupabaseConfigured && <Text style={styles.warn}>MOCK: sem Supabase, progresso 28/30 simulado</Text>}
     </ScrollView>
