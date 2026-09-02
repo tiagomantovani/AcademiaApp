@@ -12,6 +12,7 @@ export default function QRScreen({ navigation, route }) {
 
   const handleCheckIn = async () => {
     if (!isSupabaseConfigured) {
+      if (status !== 'pronto') return Alert.alert('Regra', 'Você já fez check-in de treino hoje. Catraca libera, mas treino só 1x/dia.');
       await mockDelay();
       setStatus('pendente_validacao');
       setSessoesHoje(s=>s+1);
@@ -21,6 +22,12 @@ export default function QRScreen({ navigation, route }) {
     try {
       const { data:{ user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Sem sessão');
+      // Regra: 1 treino comprovado por dia, mas catraca (check_ins) ilimitada
+      const hojeISO = new Date().toISOString().split('T')[0];
+      const { data: jaComprovada } = await supabase.from('sessoes').select('id').eq('aluno_id', user.id).eq('status','comprovada').gte('data', hojeISO+'T00:00:00').lte('data', hojeISO+'T23:59:59').limit(1).maybeSingle();
+      if (jaComprovada) return Alert.alert('Regra 1x/dia', 'Você já comprovou treino hoje. Catraca libera a qualquer momento, mas treino só conta 1x/dia.');
+      const { data: pendente } = await supabase.from('sessoes').select('id').eq('aluno_id', user.id).eq('status','pendente_validacao').limit(1).maybeSingle();
+      if (pendente) return Alert.alert('Pendente', 'Já existe QR pendente aguardando professor (b).');
       // busca gym do profile
       const { data: profile } = await supabase.from('profiles').select('gym_id').eq('id', user.id).single();
       const gymId = profile?.gym_id || '00000000-0000-0000-0000-000000000001';
@@ -40,7 +47,7 @@ export default function QRScreen({ navigation, route }) {
         status: 'pendente_validacao',
       });
       if (error) throw error;
-      // também check_ins
+      // também check_ins (catraca pode passar ilimitado, mas treino só 1x/dia)
       await supabase.from('check_ins').insert({ aluno_id: user.id, gym_id: gymId, origem:'app_qr' });
       setStatus('pendente_validacao');
       setSessoesHoje(s=>s+1);
