@@ -6,6 +6,7 @@ import TreinoScreen from '../screens/TreinoScreen';
 import QRScreen from '../screens/QRScreen';
 import PixScreen from '../screens/PixScreen';
 import ConquistasScreen from '../screens/ConquistasScreen';
+import AdminDashboard from '../screens/AdminDashboard';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ export default function AppNavigator() {
         <Stack.Screen name="QR" component={QRScreen} options={{ title:'QR Check-in a+b' }} />
         <Stack.Screen name="Pix" component={PixScreen} options={{ title:'Pagamento' }} />
         <Stack.Screen name="Conquistas" component={ConquistasScreen} options={{ title:'Conquistas' }} />
+        <Stack.Screen name="Admin" component={AdminDashboard} options={{ title:'Admin Dashboard' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
